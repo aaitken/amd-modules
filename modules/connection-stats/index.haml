@@ -1,0 +1,27 @@
+!!! 5
+%html{:lang => "en"}
+
+  %head
+
+    %meta{:charset => "utf-8"}
+    %meta{:name => "description", :content => "connection testing from the client"}
+    %meta{:name => "author", :content => "Alex Aitken"}
+
+    %title Connection Stats
+
+    %link{:rel => "stylesheet", :href => "index.css"}
+
+    %script{:data => {:main => "main"}, :src => "../../frameworks/requirejs-2.0.0.js"}
+
+  %body
+
+    %div{:class => "container"}
+      %header
+        %h1 Connection Stats
+      %div{:id => "main", :role => "main"}
+        %dl
+          %dt TCP
+          %dd
+          %dt RTT
+          %dd
+      %footer
