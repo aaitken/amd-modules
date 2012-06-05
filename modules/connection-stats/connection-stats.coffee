@@ -1,3 +1,7 @@
+#proof of concept, client-side network performance measurement
+#abandoned after handshake time measurement 120605
+#Exploring boomerang...
+
 define ['../interface/interface', '../pubsub/pubsub'], (Interface, PS)->
 
 
@@ -12,30 +16,39 @@ define ['../interface/interface', '../pubsub/pubsub'], (Interface, PS)->
   class ConnectionStats
 
 
+    #source - 1X1 pixel gif c. 35 bytes, needs come back in a single TCP packet (which also includes HTTP headers)
     constructor: (@source)-> 
+
       @times = []
-      @request()
+
+      @_request()
 
     #---------------------------------------------------------------------
 
-    request: ->
+
+    _request: ->
+
+      #push new time and fork accordingly
+      #times[0] = time of 1st request
+      #tiimes[1] = time of response after tcp handshake
+      #times[2] = time of response with established connection
       @times.push(+new Date())
-      if @times.length > 2 #request 1 = GET w/handshake; request 2 = GET w/established connection
-        @report()
+      if @times.length > 2
+        @_report()
       else
 
         img = document.createElement('img')
 
         img.onload = =>
-          @request.call(this)
+          @_request.call(this)
         img.src = @source + '?' + Math.random() + '=' + new Date()
 
 
-    report: ->
+    _report: ->
 
       times = @times
-      rtt = times[2] - times[1] #post-handshake throughput
-      tcp = times[1] - times[0] - rtt #difference b/w post and pre-handshake
+      rtt = times[2] - times[1] #post-handshake latency
+      tcp = times[1] - times[0] - rtt #handshake time (negligible or negative with http pipelining, potentially other browser optimizations...)
 
       PS.publish('ConnectionStats.numbers', {rtt: rtt, tcp: tcp})
 
